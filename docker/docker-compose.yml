@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: ../
+      dockerfile: docker/app/Dockerfile
+    restart: always
+    container_name: patient_app
+    depends_on:
+      - mysql
+    ports:
+      - 9999:9999
+    command: run_app
+    networks:
+      - patient_network
+      
+  mysql:
+    restart: always
+    container_name: mysql_db
+    image: mysql:latest
+    volumes:
+      - ../scripts/init_db.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: admin1234
+      MYSQL_DATABASE: devdb
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin1234
+    expose:
+      - "3306"
+    ports:
+      - 3306:3306
+    networks:
+      - patient_network
+
+networks:
+  patient_network:
